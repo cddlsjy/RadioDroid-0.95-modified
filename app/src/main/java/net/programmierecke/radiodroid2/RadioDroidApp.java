@@ -3,6 +3,7 @@ package net.programmierecke.radiodroid2;
 import android.app.UiModeManager;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;

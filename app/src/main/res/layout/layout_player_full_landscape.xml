@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorPlayerBackground"
+    android:orientation="horizontal">
+
+    <!-- 左侧：封面和基本信息 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/textViewGeneralInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_horizontal"
+            android:maxHeight="72sp"
+            android:minHeight="36sp"
+            android:textAlignment="center"
+            android:autoSizeMaxTextSize="24sp"
+            android:autoSizeMinTextSize="12sp"
+            android:autoSizeTextType="uniform"
+            tools:text="Info" />
+
+        <ImageView
+            android:id="@+id/imageViewArt"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/ic_launcher"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/textViewStationDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:textSize="12sp"
+            tools:text="Station Description" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textViewTimePlayed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="3:44" />
+
+            <TextView
+                android:id="@+id/textViewTimeCached"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                tools:text="-10s" />
+
+            <TextView
+                android:id="@+id/textViewNetworkUsageInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                tools:text="1mb" />
+        </LinearLayout>
+
+        <!-- 录音信息 -->
+        <LinearLayout
+            android:id="@+id/group_recording_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imgRecordingIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_start_recording"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/textViewRecordingSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:minWidth="60dp"
+                tools:text="2.5 mb" />
+
+            <TextView
+                android:id="@+id/textViewRecordingName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:text="Recording name" />
+        </LinearLayout>
+
+        <!-- 播放控制按钮 -->
+        <LinearLayout
+            android:id="@+id/layoutPlaybackControls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/buttonRecord"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/image_button_record"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/ic_start_recording" />
+
+            <ImageButton
+                android:id="@+id/buttonPrev"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/description_btn_skip_to_previous"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/ic_skip_previous_circle" />
+
+            <ImageButton
+                android:id="@+id/buttonPlay"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/detail_play"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/ic_play_circle" />
+
+            <ImageButton
+                android:id="@+id/buttonNext"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/description_btn_skip_to_next"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/ic_skip_next_circle" />
+
+            <ImageButton
+                android:id="@+id/buttonFavorite"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_favorite"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/ic_star_24dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="?android:attr/dividerVertical" />
+
+    <!-- 右侧：播放历史和收藏 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/pagerHistoryAndRecordings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.viewpager.widget.PagerTabStrip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top" />
+        </androidx.viewpager.widget.ViewPager>
+    </LinearLayout>
+
+</LinearLayout>

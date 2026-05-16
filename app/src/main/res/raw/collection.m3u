@@ -1,0 +1,33 @@
+#EXTM3U
+#EXTINF:-1 group-title="收藏",AsiaFM亚洲音乐台
+https://asiafm.cn:8070/asiafm
+#EXTINF:-1 group-title="收藏",AsiaFM亚洲经典台
+https://asiafm.cn:8070/classic
+#EXTINF:-1 group-title="收藏",AsiaFM亚洲天空台
+https://asiafm.cn:8070/sky
+#EXTINF:-1 group-title="收藏",CRI Hit FM
+http://sk.cri.cn/887.m3u8
+#EXTINF:-1 group-title="收藏",CRI 环球资讯
+http://sk.cri.cn/905.m3u8
+#EXTINF:-1 group-title="收藏",CRI 中文环球
+http://sk.cri.cn/905.m3u8
+#EXTINF:-1 group-title="收藏",CRI 轻松调频
+http://sk.cri.cn/915.m3u8
+#EXTINF:-1 group-title="收藏",北京音乐广播
+http://123.56.16.199:1935/live/fm974/96K/tzwj_video.m3u8
+#EXTINF:-1 group-title="收藏",上海动感101
+http://live.xmcdn.com/live/63/64.m3u8
+#EXTINF:-1 group-title="收藏",上海LoveRadio
+http://live.xmcdn.com/live/64/64.m3u8
+#EXTINF:-1 group-title="收藏",浙江音乐调频
+http://zjlive.zjol.com.cn/live/hifm.m3u8
+#EXTINF:-1 group-title="收藏",江苏音乐广播
+http://lzlive.vojs.cn/jAmO4A/jAmO4A.m3u8
+#EXTINF:-1 group-title="收藏",广东音乐之声
+http://ctts3.rgd.com.cn/fm993/fm993.stream/playlist.m3u8
+#EXTINF:-1 group-title="收藏",深圳飞扬971
+http://live.xmcdn.com/live/67/64.m3u8
+#EXTINF:-1 group-title="收藏",成都经典946
+http://live.xmcdn.com/live/68/64.m3u8
+#EXTINF:-1 group-title="收藏",重庆音乐广播
+http://live.xmcdn.com/live/69/64.m3u8

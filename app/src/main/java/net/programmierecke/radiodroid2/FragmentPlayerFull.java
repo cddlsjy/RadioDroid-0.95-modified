@@ -154,9 +154,11 @@ public class FragmentPlayerFull extends Fragment {
         trackHistoryAdapter = new TrackHistoryAdapter(requireActivity());
         trackHistoryAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             public void onItemRangeInserted(int positionStart, int itemCount) {
-                final LinearLayoutManager lm = (LinearLayoutManager) historyAndRecordsPagerAdapter.recyclerViewSongHistory.getLayoutManager();
-                if (lm.findFirstVisibleItemPosition() < 2) {
-                    historyAndRecordsPagerAdapter.recyclerViewSongHistory.scrollToPosition(0);
+                if (historyAndRecordsPagerAdapter != null) {
+                    final LinearLayoutManager lm = (LinearLayoutManager) historyAndRecordsPagerAdapter.recyclerViewSongHistory.getLayoutManager();
+                    if (lm.findFirstVisibleItemPosition() < 2) {
+                        historyAndRecordsPagerAdapter.recyclerViewSongHistory.scrollToPosition(0);
+                    }
                 }
             }
         });
@@ -192,47 +194,53 @@ public class FragmentPlayerFull extends Fragment {
         scrollViewContent = view.findViewById(R.id.scrollViewContent);
 
         pagerArtAndInfo = view.findViewById(R.id.pagerArtAndInfo);
-        artAndInfoPagerAdapter = new ArtAndInfoPagerAdapter(requireContext(), pagerArtAndInfo);
-        pagerArtAndInfo.setAdapter(artAndInfoPagerAdapter);
+        if (pagerArtAndInfo != null) {
+            artAndInfoPagerAdapter = new ArtAndInfoPagerAdapter(requireContext(), pagerArtAndInfo);
+            pagerArtAndInfo.setAdapter(artAndInfoPagerAdapter);
 
-        /* A hack to make horizontal ViewPager play nice with vertical ScrollView
-         * Credits to https://stackoverflow.com/a/16224484/1741638
-         */
-        pagerArtAndInfo.setOnTouchListener(new View.OnTouchListener() {
-            private static final int DRAG_THRESHOLD = 30;
-            private int downX;
-            private int downY;
+            /* A hack to make horizontal ViewPager play nice with vertical ScrollView
+             * Credits to https://stackoverflow.com/a/16224484/1741638
+             */
+            pagerArtAndInfo.setOnTouchListener(new View.OnTouchListener() {
+                private static final int DRAG_THRESHOLD = 30;
+                private int downX;
+                private int downY;
 
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        downX = (int) event.getRawX();
-                        downY = (int) event.getRawY();
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        int distanceX = Math.abs((int) event.getRawX() - downX);
-                        int distanceY = Math.abs((int) event.getRawY() - downY);
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            downX = (int) event.getRawX();
+                            downY = (int) event.getRawY();
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            int distanceX = Math.abs((int) event.getRawX() - downX);
+                            int distanceY = Math.abs((int) event.getRawY() - downY);
 
-                        if (distanceX > distanceY && distanceX > DRAG_THRESHOLD) {
-                            pagerArtAndInfo.getParent().requestDisallowInterceptTouchEvent(true);
-                            scrollViewContent.getParent().requestDisallowInterceptTouchEvent(false);
-                            if (touchInterceptListener != null) {
-                                touchInterceptListener.requestDisallowInterceptTouchEvent(true);
+                            if (distanceX > distanceY && distanceX > DRAG_THRESHOLD) {
+                                pagerArtAndInfo.getParent().requestDisallowInterceptTouchEvent(true);
+                                if (scrollViewContent != null) {
+                                    scrollViewContent.getParent().requestDisallowInterceptTouchEvent(false);
+                                }
+                                if (touchInterceptListener != null) {
+                                    touchInterceptListener.requestDisallowInterceptTouchEvent(true);
+                                }
                             }
-                        }
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        scrollViewContent.getParent().requestDisallowInterceptTouchEvent(false);
-                        pagerArtAndInfo.getParent().requestDisallowInterceptTouchEvent(false);
-                        if (touchInterceptListener != null) {
-                            touchInterceptListener.requestDisallowInterceptTouchEvent(false);
-                        }
-                        break;
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            if (scrollViewContent != null) {
+                                scrollViewContent.getParent().requestDisallowInterceptTouchEvent(false);
+                            }
+                            pagerArtAndInfo.getParent().requestDisallowInterceptTouchEvent(false);
+                            if (touchInterceptListener != null) {
+                                touchInterceptListener.requestDisallowInterceptTouchEvent(false);
+                            }
+                            break;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
+        }
 
         textViewGeneralInfo = view.findViewById(R.id.textViewGeneralInfo);
         textViewTimePlayed = view.findViewById(R.id.textViewTimePlayed);
@@ -245,63 +253,67 @@ public class FragmentPlayerFull extends Fragment {
         textViewRecordingName = view.findViewById(R.id.textViewRecordingName);
 
         pagerHistoryAndRecordings = view.findViewById(R.id.pagerHistoryAndRecordings);
-        historyAndRecordsPagerAdapter = new HistoryAndRecordsPagerAdapter(requireContext(), pagerHistoryAndRecordings);
-        pagerHistoryAndRecordings.setAdapter(historyAndRecordsPagerAdapter);
+        if (pagerHistoryAndRecordings != null) {
+            historyAndRecordsPagerAdapter = new HistoryAndRecordsPagerAdapter(requireContext(), pagerHistoryAndRecordings);
+            pagerHistoryAndRecordings.setAdapter(historyAndRecordsPagerAdapter);
+
+            historyAndRecordsPagerAdapter.recyclerViewSongHistory.setAdapter(trackHistoryAdapter);
+
+            LinearLayoutManager llmHistory = new LinearLayoutManager(getContext());
+            llmHistory.setOrientation(RecyclerView.VERTICAL);
+            historyAndRecordsPagerAdapter.recyclerViewSongHistory.setLayoutManager(llmHistory);
+
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(historyAndRecordsPagerAdapter.recyclerViewSongHistory.getContext(), llmHistory.getOrientation());
+            historyAndRecordsPagerAdapter.recyclerViewSongHistory.addItemDecoration(dividerItemDecoration);
+
+            trackHistoryViewModel = ViewModelProviders.of(this).get(TrackHistoryViewModel.class);
+            trackHistoryViewModel.getAllHistoryPaged().observe(getViewLifecycleOwner(), new Observer<PagedList<TrackHistoryEntry>>() {
+                @Override
+                public void onChanged(@Nullable PagedList<TrackHistoryEntry> songHistoryEntries) {
+                    trackHistoryAdapter.submitList(songHistoryEntries);
+                }
+            });
+
+            recordingsAdapter = new RecordingsAdapter(requireContext());
+            recordingsAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+                public void onItemRangeInserted(int positionStart, int itemCount) {
+                    final LinearLayoutManager lm = (LinearLayoutManager) historyAndRecordsPagerAdapter.recyclerViewRecordings.getLayoutManager();
+                    if (lm.findFirstVisibleItemPosition() < 2) {
+                        historyAndRecordsPagerAdapter.recyclerViewRecordings.scrollToPosition(0);
+                    }
+                }
+            });
+
+            historyAndRecordsPagerAdapter.recyclerViewRecordings.setAdapter(recordingsAdapter);
+
+            LinearLayoutManager llmRecordings = new LinearLayoutManager(getContext());
+            llmRecordings.setOrientation(RecyclerView.VERTICAL);
+            historyAndRecordsPagerAdapter.recyclerViewRecordings.setLayoutManager(llmRecordings);
+
+            historyAndRecordsPagerAdapter.recyclerViewRecordings.addItemDecoration(dividerItemDecoration);
+
+            // The scrollable part of the player should have the height of its parent but
+            // we only can do this at the runtime.
+            if (scrollViewContent != null) {
+                ViewTreeObserver viewTreeObserver = pagerHistoryAndRecordings.getViewTreeObserver();
+                if (viewTreeObserver.isAlive()) {
+                    viewTreeObserver.addOnGlobalLayoutListener(() -> {
+                        ViewGroup.LayoutParams layoutParams = pagerHistoryAndRecordings.getLayoutParams();
+                        final int newHeight = scrollViewContent.getHeight();
+                        if (newHeight != layoutParams.height) {
+                            layoutParams.height = newHeight;
+                            pagerHistoryAndRecordings.setLayoutParams(layoutParams);
+                        }
+                    });
+                }
+            }
+        }
 
         btnPlay = view.findViewById(R.id.buttonPlay);
         btnPrev = view.findViewById(R.id.buttonPrev);
         btnNext = view.findViewById(R.id.buttonNext);
         btnRecord = view.findViewById(R.id.buttonRecord);
         btnFavourite = view.findViewById(R.id.buttonFavorite);
-
-        historyAndRecordsPagerAdapter.recyclerViewSongHistory.setAdapter(trackHistoryAdapter);
-
-        LinearLayoutManager llmHistory = new LinearLayoutManager(getContext());
-        llmHistory.setOrientation(RecyclerView.VERTICAL);
-        historyAndRecordsPagerAdapter.recyclerViewSongHistory.setLayoutManager(llmHistory);
-
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(historyAndRecordsPagerAdapter.recyclerViewSongHistory.getContext(), llmHistory.getOrientation());
-        historyAndRecordsPagerAdapter.recyclerViewSongHistory.addItemDecoration(dividerItemDecoration);
-
-        trackHistoryViewModel = ViewModelProviders.of(this).get(TrackHistoryViewModel.class);
-        trackHistoryViewModel.getAllHistoryPaged().observe(getViewLifecycleOwner(), new Observer<PagedList<TrackHistoryEntry>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<TrackHistoryEntry> songHistoryEntries) {
-                trackHistoryAdapter.submitList(songHistoryEntries);
-            }
-        });
-
-        recordingsAdapter = new RecordingsAdapter(requireContext());
-        recordingsAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                final LinearLayoutManager lm = (LinearLayoutManager) historyAndRecordsPagerAdapter.recyclerViewRecordings.getLayoutManager();
-                if (lm.findFirstVisibleItemPosition() < 2) {
-                    historyAndRecordsPagerAdapter.recyclerViewRecordings.scrollToPosition(0);
-                }
-            }
-        });
-
-        historyAndRecordsPagerAdapter.recyclerViewRecordings.setAdapter(recordingsAdapter);
-
-        LinearLayoutManager llmRecordings = new LinearLayoutManager(getContext());
-        llmRecordings.setOrientation(RecyclerView.VERTICAL);
-        historyAndRecordsPagerAdapter.recyclerViewRecordings.setLayoutManager(llmRecordings);
-
-        historyAndRecordsPagerAdapter.recyclerViewRecordings.addItemDecoration(dividerItemDecoration);
-
-        // The scrollable part of the player should have the height of its parent but
-        // we only can do this at the runtime.
-        ViewTreeObserver viewTreeObserver = pagerHistoryAndRecordings.getViewTreeObserver();
-        if (viewTreeObserver.isAlive()) {
-            viewTreeObserver.addOnGlobalLayoutListener(() -> {
-                ViewGroup.LayoutParams layoutParams = pagerHistoryAndRecordings.getLayoutParams();
-                final int newHeight = scrollViewContent.getHeight();
-                if (newHeight != layoutParams.height) {
-                    layoutParams.height = newHeight;
-                    pagerHistoryAndRecordings.setLayoutParams(layoutParams);
-                }
-            });
-        }
 
         return view;
     }
@@ -360,7 +372,9 @@ public class FragmentPlayerFull extends Fragment {
 
                 updateRunningRecording();
 
-                pagerHistoryAndRecordings.setCurrentItem(1, true);
+                if (pagerHistoryAndRecordings != null) {
+                    pagerHistoryAndRecordings.setCurrentItem(1, true);
+                }
             }
         });
 
@@ -457,13 +471,17 @@ public class FragmentPlayerFull extends Fragment {
     }
 
     public void resetScroll() {
-        scrollViewContent.scrollTo(0, 0);
-        historyAndRecordsPagerAdapter.recyclerViewSongHistory.scrollToPosition(0);
-        historyAndRecordsPagerAdapter.recyclerViewRecordings.scrollToPosition(0);
+        if (scrollViewContent != null) {
+            scrollViewContent.scrollTo(0, 0);
+        }
+        if (historyAndRecordsPagerAdapter != null) {
+            historyAndRecordsPagerAdapter.recyclerViewSongHistory.scrollToPosition(0);
+            historyAndRecordsPagerAdapter.recyclerViewRecordings.scrollToPosition(0);
+        }
     }
 
     public boolean isScrolled() {
-        return scrollViewContent.getScrollY() > 0;
+        return scrollViewContent != null && scrollViewContent.getScrollY() > 0;
     }
 
     private void playLastFromHistory() {
@@ -538,25 +556,27 @@ public class FragmentPlayerFull extends Fragment {
             }
 
             Drawable flag = CountryFlagsLoader.getInstance().getFlag(requireContext(), station.CountryCode);
-            if (flag != null) {
+            if (flag != null && artAndInfoPagerAdapter != null) {
                 float k = flag.getMinimumWidth() / (float) flag.getMinimumHeight();
                 float viewHeight = artAndInfoPagerAdapter.textViewStationDescription.getTextSize();
                 flag.setBounds(0, 0, (int) (k * viewHeight), (int) viewHeight);
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                artAndInfoPagerAdapter.textViewStationDescription.setCompoundDrawablesRelative(flag, null, null, null);
-            } else {
-                artAndInfoPagerAdapter.textViewStationDescription.setCompoundDrawables(flag, null, null, null);
+            if (artAndInfoPagerAdapter != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    artAndInfoPagerAdapter.textViewStationDescription.setCompoundDrawablesRelative(flag, null, null, null);
+                } else {
+                    artAndInfoPagerAdapter.textViewStationDescription.setCompoundDrawables(flag, null, null, null);
+                }
+
+                // TODO: add votes/clicks/trend
+
+                artAndInfoPagerAdapter.textViewStationDescription.setText(station.getLongDetails(requireContext()));
+
+                String[] tags = station.TagsAll != null ? station.TagsAll.split(",") : new String[0];
+                artAndInfoPagerAdapter.viewTags.setTags(Arrays.asList(tags));
+                //artAndInfoPagerAdapter.viewTags.setTagSelectionCallback(tagSelectionCallback);
             }
-
-            // TODO: add votes/clicks/trend
-
-            artAndInfoPagerAdapter.textViewStationDescription.setText(station.getLongDetails(requireContext()));
-
-            String[] tags = station.TagsAll != null ? station.TagsAll.split(",") : new String[0];
-            artAndInfoPagerAdapter.viewTags.setTags(Arrays.asList(tags));
-            //artAndInfoPagerAdapter.viewTags.setTagSelectionCallback(tagSelectionCallback);
         }
 
         updateAlbumArt();
@@ -620,7 +640,9 @@ public class FragmentPlayerFull extends Fragment {
     }
 
     private void updateRecordings() {
-        recordingsAdapter.setRecordings(recordingsManager.getSavedRecordings());
+        if (recordingsAdapter != null) {
+            recordingsAdapter.setRecordings(recordingsManager.getSavedRecordings());
+        }
         updateRunningRecording();
     }
 
@@ -629,12 +651,16 @@ public class FragmentPlayerFull extends Fragment {
             final Map<Recordable, RunningRecordingInfo> runningRecordings = recordingsManager.getRunningRecordings();
             final RunningRecordingInfo recordingInfo = runningRecordings.entrySet().iterator().next().getValue();
 
-            groupRecordings.setVisibility(View.VISIBLE);
+            if (groupRecordings != null) {
+                groupRecordings.setVisibility(View.VISIBLE);
+            }
             imgRecordingIcon.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.blink_recording));
             textViewRecordingSize.setText(Utils.getReadableBytes(recordingInfo.getBytesWritten()));
             textViewRecordingName.setText(recordingInfo.getFileName());
         } else {
-            groupRecordings.setVisibility(View.GONE);
+            if (groupRecordings != null) {
+                groupRecordings.setVisibility(View.GONE);
+            }
             imgRecordingIcon.clearAnimation();
         }
     }
@@ -660,14 +686,16 @@ public class FragmentPlayerFull extends Fragment {
 
         if (TextUtils.isEmpty(liveInfo.getArtist()) || TextUtils.isEmpty(liveInfo.getTrack()) ||
                 LastFMApiKey.isEmpty()) {
-            if (station.hasIcon()) {
-                // TODO: Check if we already have this station's icon loaded into image view
-                Picasso.get()
-                        .load(station.IconUrl)
-                        .error(R.drawable.ic_launcher)
-                        .into(artAndInfoPagerAdapter.imageViewArt);
-            } else {
-                artAndInfoPagerAdapter.imageViewArt.setImageResource(R.drawable.ic_launcher);
+            if (artAndInfoPagerAdapter != null) {
+                if (station.hasIcon()) {
+                    // TODO: Check if we already have this station's icon loaded into image view
+                    Picasso.get()
+                            .load(station.IconUrl)
+                            .error(R.drawable.ic_launcher)
+                            .into(artAndInfoPagerAdapter.imageViewArt);
+                } else {
+                    artAndInfoPagerAdapter.imageViewArt.setImageResource(R.drawable.ic_launcher);
+                }
             }
             return;
         }
@@ -751,13 +779,15 @@ public class FragmentPlayerFull extends Fragment {
 
                     DataRadioStation station = Utils.getCurrentOrLastStation(fragment.requireContext());
 
-                    if (station != null && station.hasIcon()) {
-                        Picasso.get()
-                                .load(station.IconUrl)
-                                .error(R.drawable.ic_launcher)
-                                .into(fragment.artAndInfoPagerAdapter.imageViewArt);
-                    } else {
-                        fragment.artAndInfoPagerAdapter.imageViewArt.setImageResource(R.drawable.ic_launcher);
+                    if (fragment.artAndInfoPagerAdapter != null) {
+                        if (station != null && station.hasIcon()) {
+                            Picasso.get()
+                                    .load(station.IconUrl)
+                                    .error(R.drawable.ic_launcher)
+                                    .into(fragment.artAndInfoPagerAdapter.imageViewArt);
+                        } else {
+                            fragment.artAndInfoPagerAdapter.imageViewArt.setImageResource(R.drawable.ic_launcher);
+                        }
                     }
 
                     fragment.trackMetadataCallback = null;
@@ -779,9 +809,11 @@ public class FragmentPlayerFull extends Fragment {
                         final String albumArtUrl = albumArts.get(0).url;
 
                         if (!TextUtils.isEmpty(albumArtUrl)) {
-                            Picasso.get()
-                                    .load(albumArtUrl)
-                                    .into(fragment.artAndInfoPagerAdapter.imageViewArt);
+                            if (fragment.artAndInfoPagerAdapter != null) {
+                                Picasso.get()
+                                        .load(albumArtUrl)
+                                        .into(fragment.artAndInfoPagerAdapter.imageViewArt);
+                            }
 
                             if (!albumArtUrl.equals(trackHistoryEntry.stationIconUrl)) {
                                 fragment.trackHistoryRepository.setTrackArtUrl(trackHistoryEntry.uid, albumArtUrl);
